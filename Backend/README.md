@@ -82,13 +82,84 @@ Assuming a `GET /users/:id` endpoint, a typical response might look like:
     "firstname": "John",
     "lastname": "Doe"
   },
-  "email": "john.doe
-  @example.com",
+  "email": "john.doe@example.com",
   "socketId": null
 }
 ```
 
+---
+
+# User Login Endpoint Documentation
+
+## Endpoint
+
+`POST /users/login`
+
+## Description
+Authenticates a user with email and password. Returns a JWT token and user data if credentials are valid.
+
+## Request Body
+Send a JSON object with the following structure:
+
+```
+{
+  "email": "string (valid email, required)",
+  "password": "string (min 6 chars, required)"
+}
+```
+
+### Example
+```
+{
+  "email": "john.doe@example.com",
+  "password": "securePassword123"
+}
+```
+
+## Responses
+
+### Success
+- **Status Code:** `200 OK`
+- **Body:**
+  ```json
+  {
+    "token": "<jwt_token>",
+    "user": {
+      "_id": "<user_id>",
+      "fullname": {
+        "firstname": "John",
+        "lastname": "Doe"
+      },
+      "email": "john.doe@example.com"
+      // ...other user fields
+    }
+  }
+  ```
+
+### Validation Error
+- **Status Code:** `400 Bad Request`
+- **Body:**
+  ```json
+  {
+    "errors": [
+      {
+        "msg": "Error message",
+        "param": "field_name",
+        "location": "body"
+      }
+    ]
+  }
+  ```
+
+### Authentication Error
+- **Status Code:** `401 Unauthorized`
+- **Body:**
+  ```json
+  {
+    "message": "User not found" // or "Invalid credentials"
+  }
+  ```
+
 ## Notes
-- The `email` must be unique.
-- The `password` is securely hashed before storage.
-- On success, a JWT token is returned for authentication.
+- Returns a JWT token for authenticated sessions.
+- Email and password must match a registered user.
