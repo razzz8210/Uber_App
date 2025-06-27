@@ -1,0 +1,94 @@
+# User Registration Endpoint Documentation
+
+<!--
+This section of the README.md file is intended to document the available API endpoints for the Uber Project backend. Please list each endpoint, its HTTP method, expected request parameters, and response structure. Include authentication requirements and example requests/responses where applicable.
+-->
+## Endpoint
+
+`POST /users/register`
+
+## Description
+Registers a new user in the system. Validates the input data, hashes the password, and returns an authentication token upon successful registration.
+
+## Request Body
+Send a JSON object with the following structure:
+
+```
+{
+  "fullname": {
+    "firstname": "string (min 3 chars, required)",
+    "lastname": "string (min 3 chars, optional)"
+  },
+  "email": "string (valid email, required)",
+  "password": "string (min 6 chars, required)"
+}
+```
+
+### Example
+```
+{
+  "fullname": {
+    "firstname": "John",
+    "lastname": "Doe"
+  },
+  "email": "john.doe@example.com",
+  "password": "securePassword123"
+}
+```
+
+## Responses
+
+### Success
+- **Status Code:** `201 Created`
+- **Body:**
+  ```json
+  {
+    "token": "<jwt_token>",
+    "user": {
+      "_id": "<user_id>",
+      "fullname": {
+        "firstname": "John",
+        "lastname": "Doe"
+      },
+      "email": "john.doe@example.com"
+      // ...other user fields
+    }
+  }
+  ```
+
+### Validation Error
+- **Status Code:** `400 Bad Request`
+- **Body:**
+  ```json
+  {
+    "errors": [
+      {
+        "msg": "Error message",
+        "param": "field_name",
+        "location": "body"
+      }
+    ]
+  }
+  ```
+
+## Example: Get User (Response)
+
+Assuming a `GET /users/:id` endpoint, a typical response might look like:
+
+```json
+{
+  "_id": "60f7c2b5e1d2c8a1b4e5d6f7",
+  "fullname": {
+    "firstname": "John",
+    "lastname": "Doe"
+  },
+  "email": "john.doe
+  @example.com",
+  "socketId": null
+}
+```
+
+## Notes
+- The `email` must be unique.
+- The `password` is securely hashed before storage.
+- On success, a JWT token is returned for authentication.
