@@ -163,3 +163,85 @@ Send a JSON object with the following structure:
 ## Notes
 - Returns a JWT token for authenticated sessions.
 - Email and password must match a registered user.
+
+---
+
+# Get User Profile Endpoint Documentation
+
+## Endpoint
+
+`GET /users/profile`
+
+## Description
+Returns the authenticated user's profile information. Requires a valid JWT token in the `Authorization` header or as a cookie.
+
+## Authentication
+- Required: Yes (JWT token)
+- Header: `Authorization: Bearer <token>`
+
+## Response
+
+### Success
+- **Status Code:** `200 OK`
+- **Body:**
+  ```json
+  {
+    "user": {
+      "_id": "60f7c2b5e1d2c8a1b4e5d6f7",
+      "fullname": {
+        "firstname": "John",
+        "lastname": "Doe"
+      },
+      "email": "john.doe@example.com",
+      "socketId": null
+    }
+  }
+  ```
+
+### Authentication Error
+- **Status Code:** `401 Unauthorized`
+- **Body:**
+  ```json
+  {
+    "message": "Authentication token is missing" // or "Invalid token" or "Token is blacklisted"
+  }
+  ```
+
+---
+
+# User Logout Endpoint Documentation
+
+## Endpoint
+
+`GET /users/logout`
+
+## Description
+Logs out the authenticated user by blacklisting the JWT token. Requires a valid JWT token in the `Authorization` header or as a cookie.
+
+## Authentication
+- Required: Yes (JWT token)
+- Header: `Authorization: Bearer <token>`
+
+## Response
+
+### Success
+- **Status Code:** `200 OK`
+- **Body:**
+  ```json
+  {
+    "message": "Logged out successfully"
+  }
+  ```
+
+### Authentication Error
+- **Status Code:** `401 Unauthorized`
+- **Body:**
+  ```json
+  {
+    "message": "Authentication token is missing" // or "Invalid token" or "Token is blacklisted"
+  }
+  ```
+
+## Notes
+- The logout endpoint blacklists the current JWT token, preventing further use.
+- Both endpoints require the user to be authenticated.
