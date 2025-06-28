@@ -59,11 +59,18 @@ module.exports.getUserProfile = async(req,res,next)=>{
     res.status(200).json({ user: req.user } );
 }
 
-module.exports.logoutUser = async(req,res,next)=>{
-    res.clearCookie('token');
-    const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+module.exports.logoutUser = async (req, res, next) => {
+    const token = req.headers.authorization?.split(' ')[1];
 
-    await blacklistTokenModel.create({ token });
-    
-    res.status(200).json({ message: 'Logged out successfully' });
-}
+    if (!token) {
+        return res.status(401).json({ message: 'No token provided for logout' });
+    }
+
+    try {
+        await blacklistTokenModel.create({ token });
+        res.status(200).json({ message: 'Logged out successfully' });
+    } catch (error) {
+        console.error('[logoutUser] Error while blacklisting token:', error.message);
+        res.status(500).json({ message: 'Logout failed' });
+    }
+};

@@ -353,17 +353,165 @@ Send a JSON object with the following structure:
 
 ---
 
-# Example: Get Captain (Response)
+# Captain Endpoints Documentation
 
-Assuming a `GET /captains/:id` endpoint, a typical response might look like:
+## Register Captain
 
+### Endpoint
+`POST /captains/register`
+
+### Description
+Registers a new captain. Requires vehicle and personal details. Returns a JWT token and captain data on success.
+
+### Request Body
+```
+{
+  "fullname": {
+    "firstname": "string (min 3 chars, required)",
+    "lastname": "string (min 3 chars, required)"
+  },
+  "email": "string (valid email, required)",
+  "password": "string (min 6 chars, required)",
+  "vehicle": {
+    "color": "string (min 3 chars, required)",
+    "plate": "string (format: 'UP 66 KY 2023', required)",
+    "capacity": "integer (1-10, required)",
+    "vehicleType": "string (car|bike|auto, required)"
+  }
+}
+```
+#### Example
+```
+{
+  "fullname": { "firstname": "Alice", "lastname": "Smith" },
+  "email": "alice.smith@example.com",
+  "password": "strongPassword123",
+  "vehicle": {
+    "color": "Red",
+    "plate": "UP 66 KY 2023",
+    "capacity": 4,
+    "vehicleType": "car"
+  }
+}
+```
+
+### Success Response
+- **Status:** 201 Created
+- **Body:**
+```json
+{
+  "token": "<jwt_token>",
+  "captain": {
+    "_id": "<captain_id>",
+    "fullname": { "firstname": "Alice", "lastname": "Smith" },
+    "email": "alice.smith@example.com",
+    "vehicle": {
+      "color": "Red",
+      "plate": "UP 66 KY 2023",
+      "capacity": 4,
+      "vehicleType": "car"
+    }
+    // ...other captain fields
+  }
+}
+```
+
+### Validation Error
+- **Status:** 400 Bad Request
+- **Body:**
+```json
+{
+  "errors": [
+    { "msg": "Error message", "param": "field_name", "location": "body" }
+  ]
+}
+```
+
+### Duplicate Email Error
+- **Status:** 400 Bad Request
+- **Body:**
+```json
+{
+  "message": "Captain with this email already exists"
+}
+```
+
+---
+
+## Captain Login
+
+### Endpoint
+`POST /captains/login`
+
+### Description
+Authenticates a captain with email and password. Returns a JWT token and captain data if credentials are valid.
+
+### Request Body
+```
+{
+  "email": "string (valid email, required)",
+  "password": "string (min 6 chars, required)"
+}
+```
+#### Example
+```
+{
+  "email": "alice.smith@example.com",
+  "password": "strongPassword123"
+}
+```
+
+### Success Response
+- **Status:** 200 OK
+- **Body:**
+```json
+{
+  "token": "<jwt_token>",
+  "captain": {
+    "_id": "<captain_id>",
+    "fullname": { "firstname": "Alice", "lastname": "Smith" },
+    "email": "alice.smith@example.com",
+    "vehicle": {
+      "color": "Red",
+      "plate": "UP 66 KY 2023",
+      "capacity": 4,
+      "vehicleType": "car"
+    }
+    // ...other captain fields
+  }
+}
+```
+
+### Error Response
+- **Status:** 400 Bad Request
+- **Body:**
+```json
+{
+  "message": "Invalid email or password"
+}
+```
+
+---
+
+## Get Captain Profile
+
+### Endpoint
+`GET /captains/profile`
+
+### Description
+Returns the authenticated captain's profile. Requires a valid JWT token in the `Authorization` header or as a cookie.
+
+### Authentication
+- Required: Yes (JWT token)
+- Header: `Authorization: Bearer <token>`
+
+### Success Response
+- **Status:** 200 OK
+- **Body:**
 ```json
 {
   "_id": "60f7c2b5e1d2c8a1b4e5d6f8",
-  "fullname": {
-    "firstname": "Alice",
-    "lastname": "Smith"
-  },
+  "fullname": { "firstname": "Alice", "lastname": "Smith" },
   "email": "alice.smith@example.com",
   "vehicle": {
     "color": "Red",
@@ -373,15 +521,70 @@ Assuming a `GET /captains/:id` endpoint, a typical response might look like:
   },
   "socketId": null,
   "isOnline": false,
-  "location": {
-    "latitude": null,
-    "longitude": null
-  }
+  "location": { "latitude": null, "longitude": null }
+}
+```
+
+### Authentication Error
+- **Status:** 401 Unauthorized
+- **Body:**
+```json
+{
+  "message": "Authentication token is missing" // or "Invalid token" or "Token is blacklisted"
 }
 ```
 
 ---
 
-# Other Captain Endpoints
+## Captain Logout
 
-> Add documentation for login, profile, and logout endpoints for captains if implemented, following the same structure as above.
+### Endpoint
+`GET /captains/logout`
+
+### Description
+Logs out the authenticated captain by blacklisting the JWT token. Requires a valid JWT token in the `Authorization` header or as a cookie.
+
+### Authentication
+- Required: Yes (JWT token)
+- Header: `Authorization: Bearer <token>`
+
+### Success Response
+- **Status:** 200 OK
+- **Body:**
+```json
+{
+  "message": "Logged out successfully"
+}
+```
+
+### Authentication Error
+- **Status:** 401 Unauthorized or 400 Bad Request
+- **Body:**
+```json
+{
+  "message": "Authentication token is missing" // or "Invalid token" or "Token is blacklisted" or "No token provided"
+}
+```
+
+---
+
+# Example: Get Captain (Response)
+
+Assuming a `GET /captains/:id` endpoint, a typical response might look like:
+
+```json
+{
+  "_id": "60f7c2b5e1d2c8a1b4e5d6f8",
+  "fullname": { "firstname": "Alice", "lastname": "Smith" },
+  "email": "alice.smith@example.com",
+  "vehicle": {
+    "color": "Red",
+    "plate": "UP 66 KY 2023",
+    "capacity": 4,
+    "vehicleType": "car"
+  },
+  "socketId": null,
+  "isOnline": false,
+  "location": { "latitude": null, "longitude": null }
+}
+```
