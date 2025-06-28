@@ -245,3 +245,143 @@ Logs out the authenticated user by blacklisting the JWT token. Requires a valid 
 ## Notes
 - The logout endpoint blacklists the current JWT token, preventing further use.
 - Both endpoints require the user to be authenticated.
+
+---
+
+# Captain Registration Endpoint Documentation
+
+## Endpoint
+
+`POST /captains/register`
+
+## Description
+Registers a new captain in the system. Validates the input data, hashes the password, and returns an authentication token upon successful registration. Vehicle information is required.
+
+## Request Body
+Send a JSON object with the following structure:
+
+```
+{
+  "fullname": {
+    "firstname": "string (min 3 chars, required)",
+    "lastname": "string (min 3 chars, required)"
+  },
+  "email": "string (valid email, required)",
+  "password": "string (min 6 chars, required)",
+  "vehicle": {
+    "color": "string (min 3 chars, required)",
+    "plate": "string (format: 'UP 66 KY 2023', required)",
+    "capacity": "integer (1-10, required)",
+    "vehicleType": "string (car|bike|auto, required)"
+  }
+}
+```
+
+### Example
+```
+{
+  "fullname": {
+    "firstname": "Alice",
+    "lastname": "Smith"
+  },
+  "email": "alice.smith@example.com",
+  "password": "strongPassword123",
+  "vehicle": {
+    "color": "Red",
+    "plate": "UP 66 KY 2023",
+    "capacity": 4,
+    "vehicleType": "car"
+  }
+}
+```
+
+## Responses
+
+### Success
+- **Status Code:** `201 Created`
+- **Body:**
+  ```json
+  {
+    "token": "<jwt_token>",
+    "captain": {
+      "_id": "<captain_id>",
+      "fullname": {
+        "firstname": "Alice",
+        "lastname": "Smith"
+      },
+      "email": "alice.smith@example.com",
+      "vehicle": {
+        "color": "Red",
+        "plate": "UP 66 KY 2023",
+        "capacity": 4,
+        "vehicleType": "car"
+      },
+      // ...other captain fields
+    }
+  }
+  ```
+
+### Validation Error
+- **Status Code:** `400 Bad Request`
+- **Body:**
+  ```json
+  {
+    "errors": [
+      {
+        "msg": "Error message",
+        "param": "field_name",
+        "location": "body"
+      }
+    ]
+  }
+  ```
+
+### Duplicate Email Error
+- **Status Code:** `400 Bad Request`
+- **Body:**
+  ```json
+  {
+    "message": "Captain with this email already exists"
+  }
+  ```
+
+## Notes
+- The `email` and `vehicle.plate` must be unique.
+- The `password` is securely hashed before storage.
+- On success, a JWT token is returned for authentication.
+- All vehicle fields are required and validated.
+
+---
+
+# Example: Get Captain (Response)
+
+Assuming a `GET /captains/:id` endpoint, a typical response might look like:
+
+```json
+{
+  "_id": "60f7c2b5e1d2c8a1b4e5d6f8",
+  "fullname": {
+    "firstname": "Alice",
+    "lastname": "Smith"
+  },
+  "email": "alice.smith@example.com",
+  "vehicle": {
+    "color": "Red",
+    "plate": "UP 66 KY 2023",
+    "capacity": 4,
+    "vehicleType": "car"
+  },
+  "socketId": null,
+  "isOnline": false,
+  "location": {
+    "latitude": null,
+    "longitude": null
+  }
+}
+```
+
+---
+
+# Other Captain Endpoints
+
+> Add documentation for login, profile, and logout endpoints for captains if implemented, following the same structure as above.
