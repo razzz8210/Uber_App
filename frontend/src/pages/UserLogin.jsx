@@ -1,7 +1,9 @@
 
-import { set } from 'mongoose';
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { UserContext } from '../context/UserProvider';
+import { useNavigate  } from 'react-router-dom';
+import axios from 'axios';
 
 function UserLogin() {
   const [email, setEmail] = useState('');
@@ -12,18 +14,27 @@ function UserLogin() {
     password: ''
   });
 
-  const submitHandler = (e)=>{
+  const [user, setUser] = useContext(UserContext);
+  const navigate = useNavigate();
+
+  const submitHandler =async (e)=>{
     e.preventDefault();
-    if (email && password) {
-      // Here you would typically handle the login logic, e.g., sending a request to your backend
-      setUserData({
-        email: email, 
-        password: password
-      });
+    const userData = {  
+      email: email,
+      password: password
+    };
+
+    const response =await axios.post(`${import.meta.env.VITE_BASE_URL}/users/login`, userData)
+    if (response.status === 200) {
+      const data = response.data;
+      setUser(data.user);
+      localStorage.setItem('token', data.token); // Store user data in localStorage
+      navigate('/home');
+    } 
       // Reset the form fields after submission   
       setEmail('');
       setPassword('');  
-  }
+  
   };
 
   

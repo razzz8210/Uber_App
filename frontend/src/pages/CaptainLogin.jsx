@@ -1,29 +1,38 @@
 
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { CaptainContext } from '../context/CaptainProvider';
 
 function CaptainLogin() {
   const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const {captain,setCaptain} = useContext(CaptainContext);
+    const navigate = useNavigate();
   
-    const [captainData, setCaptainData] = useState({
-      email: '',
-      password: ''
-    });
-  
-    const submitHandler = (e)=>{
+    const submitHandler = async (e)=>{
       e.preventDefault();
-      if (email && password) {
-        // Here you would typically handle the login logic, e.g., sending a request to your backend
-        setCaptainData({
-          email: email, 
-          password: password
-        });
-        // Reset the form fields after submission   
+      const captainData = {
+        email: email,
+        password: password
+      };
+
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/login`, captainData);
+      if (response.status === 200) {
+        const data = response.data;
+        setCaptain(data.captain);
+        localStorage.setItem('token', JSON.stringify(data.token)); // Store captain data in localStorage
+        navigate('/captain-home');
+      } else {
+        console.error('Error logging in:', response.data);
+      }
+        // Clear the input fields after submission
+      
         setEmail('');
         setPassword('');  
-    }
     };
+
 
   return (
     <div className='p-7 h-screen flex flex-col justify-between'>
