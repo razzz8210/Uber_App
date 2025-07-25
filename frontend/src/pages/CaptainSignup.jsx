@@ -152,7 +152,7 @@ function CaptainSignup() {
         </form>
       </div>
       <div>
-        <p className='text-[10px] leading-tight'>
+        <p className='text-[10px] leadinteg-tight mt-3'>
           This site is protected by reCAPTCHA and the <span className='underline'>Google Privacy Policy</span> and Terms of Service apply.
         </p>
       </div>
