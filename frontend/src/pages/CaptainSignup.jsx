@@ -1,22 +1,25 @@
-import React, { useContext, useState } from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { CaptainContext } from '../context/CaptainProvider';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { CaptainDataContext } from '../context/CaptainProvider'
+import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 
-function CaptainSignup() {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [color, setColor] = useState('');
-  const [plate, setPlate] = useState('');
-  const [capacity, setCapacity] = useState('');
-  const [vehicleType, setVehicleType] = useState('');
+const CaptainSignup = () => {
 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
-  const { captain, setCaptain } = useContext(CaptainContext)
+  const [ email, setEmail ] = useState('')
+  const [ password, setPassword ] = useState('')
+  const [ firstName, setFirstName ] = useState('')
+  const [ lastName, setLastName ] = useState('')
+
+  const [ vehicleColor, setVehicleColor ] = useState('')
+  const [ vehiclePlate, setVehiclePlate ] = useState('')
+  const [ vehicleCapacity, setVehicleCapacity ] = useState('')
+  const [ vehicleType, setVehicleType ] = useState('')
+
+
+  const { captain, setCaptain } = React.useContext(CaptainDataContext)
 
   const submitHandler = async(e) => {
     e.preventDefault();
@@ -29,9 +32,9 @@ function CaptainSignup() {
       email: email,
       password: password,
       vehicle: {
-        color: color,
-        plate: plate,
-        capacity: capacity,
+        color: vehicleColor,
+        plate: vehiclePlate,
+        capacity: vehicleCapacity,
         vehicleType: vehicleType
       }
     };
@@ -39,7 +42,7 @@ function CaptainSignup() {
     if (response.status === 201) {  
       const data = response.data;
       setCaptain(data.captain)
-      localStorage.setItem('token', JSON.stringify(data.token)); // Store user data in localStorage
+      localStorage.setItem('token', data.token);
       navigate('/captain-home');
     } else {
       console.error('Error creating captain account:', response.data);
@@ -106,16 +109,16 @@ function CaptainSignup() {
               required
               type="text"
               placeholder='Vehicle-Color'
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
+              value={vehicleColor}
+              onChange={(e) => setVehicleColor(e.target.value)}
               className='bg-[#eeeeee]  rounded px-4 py-2 border w-1/2 text-lg placeholder:text-base '
             />
             <input
               required
               type="text"
               placeholder='Vehicle Plate'
-              value={plate}
-              onChange={(e) => setPlate(e.target.value)}
+              value={vehiclePlate}
+              onChange={(e) => setVehiclePlate(e.target.value)}
               className='bg-[#eeeeee] rounded px-4 py-2 border w-1/2 text-lg placeholder:text-base '
             />
           </div>
@@ -124,8 +127,8 @@ function CaptainSignup() {
               required
               type="text"
               placeholder='Vehicle Capacity'
-              value={capacity}
-              onChange={(e) => setCapacity(e.target.value)}
+              value={vehicleCapacity}
+              onChange={(e) => setVehicleCapacity(e.target.value)}
               className='bg-[#eeeeee] rounded px-4 py-2 border w-1/2 text-lg placeholder:text-base '
             />
             <select

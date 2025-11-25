@@ -1,11 +1,32 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
 
-const ConfirmRidePopup = ( props ) => {
-    const [otp,setOTP]= useState('')
+const ConfirmRidePopup = (props) => {
+    const [ otp, setOtp ] = useState('')
+    const navigate = useNavigate()
 
-    const submitHandler = (e)=>{
-        e.preventDefault() 
+    const submitHandler = async (e) => {
+        e.preventDefault()
+
+        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/rides/start-ride`, {
+            params: {
+                rideId: props.ride._id,
+                otp: otp
+            },
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+        })
+
+        if (response.status === 200) {
+            props.setConfirmRidePopupPanel(false)
+            props.setRidePopupPanel(false)
+            navigate('/captain-riding', { state: { ride: props.ride } })
+        }
+
+
     }
 
     return (
@@ -54,7 +75,7 @@ const ConfirmRidePopup = ( props ) => {
                     }}>
                         <input
                             value={otp}
-                            onChange={(e)=>setOTP(e.target.value)}
+                            onChange={(e)=>setOtp(e.target.value)}
                             type="text" 
                             className='bg-[#eee] px-6 py-4 font-mono text-base rounded-lg w-full mt-3'
                             placeholder='Enter OTP' />

@@ -1,4 +1,3 @@
-const { model } = require('mongoose')
 const userModel = require('../models/user.model.js')
 const userService = require('../services/user.service.js')
 const { validationResult } = require('express-validator');

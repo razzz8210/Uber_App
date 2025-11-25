@@ -1,8 +1,7 @@
-import React, { useContext, useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import axios from 'axios';
-import { UserContext } from '../context/UserProvider';
-import { set } from 'mongoose';
+import axios from 'axios'
+import { UserDataContext } from '../context/UserProvider'
 
 function UserSignup() {
   const [firstName, setFirstName] = useState('');
@@ -16,7 +15,7 @@ function UserSignup() {
   const [vehicleType, setVehicleType] = useState('');
 
   const navigate = useNavigate();
-  const [user, setUser] = useContext(UserContext);
+  const { user, setUser } = useContext(UserDataContext);
 
   const submitHandler = async (e) => {
     e.preventDefault();

@@ -1,47 +1,57 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { CaptainContext } from '../context/CaptainProvider'
+import { CaptainDataContext } from '../context/CaptainProvider'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios';
+import axios from 'axios'
 
-const CaptainProtectWrapper = ({ children }) => {
-  const navigate = useNavigate();
-  const {captain, setCaptain} = useContext(CaptainContext);
-  const [isLoading, setIsLoading] = useState(true);
+const CaptainProtectWrapper = ({
+    children
+}) => {
 
-  useEffect(() => {
-    const token = JSON.parse(localStorage.getItem('token'));
+    const token = localStorage.getItem('token')
+    const navigate = useNavigate()
+    const { captain, setCaptain } = useContext(CaptainDataContext)
+    const [ isLoading, setIsLoading ] = useState(true)
 
-    if (!token) {
-      navigate('/captain-login');
-      return;
+
+
+
+    useEffect(() => {
+        if (!token) {
+            navigate('/captain-login')
+        }
+
+        axios.get(`${import.meta.env.VITE_BASE_URL}/captains/profile`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }).then(response => {
+            if (response.status === 200) {
+                setCaptain(response.data.captain)
+                setIsLoading(false)
+            }
+        })
+            .catch(err => {
+
+                localStorage.removeItem('token')
+                navigate('/captain-login')
+            })
+    }, [ token ])
+
+    
+
+    if (isLoading) {
+        return (
+            <div>Loading...</div>
+        )
     }
 
-    const fetchCaptainProfile = async () => {
-      try {
-        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/captains/profile`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
 
-        if (response.status === 200) {
-          setCaptain(response.data.captain);
-        }
-      } catch (error) {
-        console.error('Error fetching captain profile:', error);
-        localStorage.removeItem('token');
-        navigate('/captain-login');
-      } finally {
-        setIsLoading(false);
-      }
-    };
 
-    fetchCaptainProfile();
-  }, [navigate, setCaptain]);
+    return (
+        <>
+            {children}
+        </>
+    )
+}
 
-  if (isLoading) return <div>Loading...</div>;
-
-  return <>{children}</>;
-};
-
-export default CaptainProtectWrapper;
+export default CaptainProtectWrapper
